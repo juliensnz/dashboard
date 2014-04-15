@@ -2,7 +2,7 @@
 
 app.controller('MainCtrl', function ($scope, Github, Jira) {
     Github.getOrganization('akeneo').then(function(org) {
-            $scope.org = org;
+        $scope.org = org;
     }).then(function() {
         Github.getTopContributors($scope.org).then(function(top) {
             $scope.topContributors = top;
@@ -20,6 +20,4 @@ app.controller('MainCtrl', function ($scope, Github, Jira) {
             $scope.fasttrack = fasttrack;
         });
     });
-
-    window.scope = $scope;
 });

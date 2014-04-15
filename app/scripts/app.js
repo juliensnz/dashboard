@@ -19,3 +19,7 @@ angular
   });
 
 var app = angular.module('dashboardApp');
+
+app.config(function () {
+
+});
