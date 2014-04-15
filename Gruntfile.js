@@ -43,8 +43,8 @@ module.exports = function (grunt) {
                 tasks: ['newer:jshint:test', 'karma']
             },
             styles: {
-                files: ['<%= yeoman.app %>/styles/{,*/}*.css'],
-                tasks: ['newer:copy:styles', 'autoprefixer']
+                files: ['<%= yeoman.app %>/styles/less/{,*/}*.less'],
+                tasks: ['newer:copy:styles', 'autoprefixer', 'less']
             },
             gruntfile: {
                 files: ['Gruntfile.js']
@@ -58,6 +58,19 @@ module.exports = function (grunt) {
                     '.tmp/styles/{,*/}*.css',
                     '<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
                 ]
+            }
+        },
+        less: {
+            development: {
+                options: {
+                    compress: true,
+                    yuicompress: true,
+                    optimization: 2
+                },
+                files: {
+                    // target.css file: source.less file
+                    "<%= yeoman.app %>/styles/css/main.css": "<%= yeoman.app %>/styles/less/{,*/}*.less"
+                }
             }
         },
 
@@ -352,6 +365,7 @@ module.exports = function (grunt) {
             'bowerInstall',
             'concurrent:server',
             'autoprefixer',
+            'less',
             'connect:livereload',
             'watch'
         ]);
@@ -392,4 +406,6 @@ module.exports = function (grunt) {
         'test',
         'build'
     ]);
+
+    grunt.loadNpmTasks('grunt-contrib-less');
 };
