@@ -1,0 +1,110 @@
+<div class="navbar navbar-default navbar-static-top" role="navigation" bs-navbar>
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#"><img width="50" height="50" ng-src="{{org.avatar_url}}"/></a>
+    </div>
+    <ul class="nav navbar-nav">
+      <!--<li data-match-route="/?(navbar)?"><a href="#/">Home</a></li>
+      <li data-match-route="/page-one"><a href="#/page-one">Page One</a></li>
+      <li data-match-route="/page-two.*"><a href="#/page-two/sub-a">Page Two</a></li>-->
+    </ul>
+    <ul class="nav navbar-nav navbar-right">
+      <li><span class="pin-container">
+        <span ng-class="{unread:loading}" class="pin"></span>
+      </span></li>
+    </ul>
+    <div class="navbar-form navbar-right">
+      <div class="form-group">
+        <button class="btn btn-default btn-last" ng-click="updateStatus()"><i class="glyphicon glyphicon-refresh"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row"><div class="col-md-6">
+    <table class="table table-bordered table-striped table-fasttrack">
+      <thead>
+        <tr>
+          <th colspan="2">Fast track</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="(issueType, value) in fasttrack.issues">
+          <td class="issue-type">{{ issueType }}</td>
+          <td class="issue-count">{{ value.total }}</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr><td colspan="2">
+          <div class="progress progress-no-margin">
+            <div ng-repeat="(issueType, value) in fasttrack.issues" class="progress-bar" ng-class="{'progress-bar-success': issueType == 'Delivered', 'progress-bar-info': issueType == 'Done', 'progress-bar-warning': issueType == 'In progress', 'progress-bar-danger': issueType == 'Todo'}" role="progressbar" aria-valuenow="{{ (value / fasttrack.total) * 100 }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ (value.total / fasttrack.total) * 100 }}%;">
+              {{ value.total }}
+            </div>
+          </div>
+        </td></tr>
+      </tfoot>
+    </table>
+  </div>
+  <div class="col-md-6">
+    <table class="table table-bordered table-striped table-pulls">
+      <thead>
+        <tr>
+          <th colspan="2">Open PRs</th>
+          <th>Behat</th>
+          <th>Travis</th>
+          <th><i class="glyphicon glyphicon-eye-open"></i></th>
+          <th><i class="glyphicon glyphicon-comment"></i></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="pull in repo.pulls">
+          <td class="pull">
+            <img class="profile-pic" width="30" height="30" ng-src="{{ pull.user.avatar_url }}"/>
+            {{ pull.title.length > 30 ? ((pull.title | limitTo: 30) + '...') : pull.title }}</td>
+          <td>
+            <a ng-href="{{ pull.html_url }}" target="_blank">{{ pull.number }}</a>
+          </td>
+          <td>
+            <i ng-if="!pull.behatBuild" class="glyphicon glyphicon-ban-circle"></i>
+            <i ng-if="pull.behatBuild.result == 'SUCCESS'" class="glyphicon glyphicon-ok-circle"></i>
+            <i ng-if="pull.behatBuild.result == 'FAILURE'" class="glyphicon glyphicon-remove-circle"></i>
+          </td>
+          <td>
+            <i ng-if="!pull.travisBuild || pull.travisBuild.result == null" class="glyphicon glyphicon-ban-circle"></i>
+            <i ng-if="pull.travisBuild.result == 0" class="glyphicon glyphicon-ok-circle"></i>
+            <i ng-if="pull.travisBuild.result == 1" class="glyphicon glyphicon-remove-circle"></i>
+          </td>
+          <td class="count count-review">
+            {{ pull.reviews.length }}
+          </td>
+          <td class="count count-review">
+            {{ pull.comments.length }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <table class="table table-bordered table-striped table-contributors">
+      <thead>
+        <tr>
+          <th colspan="2">Top contributors</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="contributor in topContributors | orderBy:'commitCount':'true' | limitTo: 5" class="top-contributor">
+          <td>
+            <span class="user">
+              <img class="profile-pic" width="30" height="30" ng-src="{{ contributor.author.avatar_url }}"/>
+              <span class="username"><a target="_blank" href="{{ contributor.author.html_url }}">@{{ contributor.author.login }}</a></span>
+            </span>
+          </td>
+          <td><strong>{{ contributor.commitCount }}</strong> commits</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

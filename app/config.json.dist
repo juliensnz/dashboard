@@ -1,0 +1,20 @@
+{
+    "scrutinizer": {
+        "token": "token",
+        "baseUrl": "https://scrutinizer-ci.com"
+    },
+    "jenkins": {
+        "token": "token",
+        "baseUrl": "http://ci.akeneo.com"
+    },
+    "jira": {
+        "token": "token",
+        "baseUrl": "https://akeneo.atlassian.net"
+    },
+    "travis": {
+        "baseUrl": "https://api.travis-ci.org"
+    },
+    "github": {
+        "baseUrl": "https://api.github.com"
+    }
+}
