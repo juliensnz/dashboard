@@ -26,6 +26,7 @@ app.service('DistantStorage', ['$rootScope', '$http', '$q', 'Routing', function(
         get: function(url, config) {
             return $http.get(url, config);
         }
+
     };
 
     return service;
