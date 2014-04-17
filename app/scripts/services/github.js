@@ -8,7 +8,8 @@ app.service('Github', [
     'Travis',
     'Scrutinizer',
     'Jenkins',
-    function($rootScope, $q, HybridStorage, Routing, Travis, Scrutinizer, Jenkins) {
+    'Cleanliness',
+    function($rootScope, $q, HybridStorage, Routing, Travis, Scrutinizer, Jenkins, Cleanliness) {
         var config = {
             'routes': {
                 'repo': {
@@ -44,20 +45,25 @@ app.service('Github', [
 
                         for (var pull in pulls) {
                             (function(pull) {
-                                pullPromises.push(HybridStorage.get(Routing.clean(pulls[pull].review_comments_url)).then(function(reviews) {
+                                var reviewsUrl = Routing.clean(pulls[pull].review_comments_url);
+                                pullPromises.push(HybridStorage.get(reviewsUrl).then(function(reviews) {
                                     pulls[pull].reviews = reviews;
                                 }));
+
+                                Cleanliness.invalidate(reviewsUrl);
                             })(pull);
 
                             (function(pull) {
-                                pullPromises.push(HybridStorage.get(Routing.clean(pulls[pull].comments_url)).then(function(comments) {
+                                var commentsUrl = Routing.clean(pulls[pull].comments_url);
+                                pullPromises.push(HybridStorage.get(commentsUrl).then(function(comments) {
                                     pulls[pull].comments = comments;
                                 }));
+
+                                Cleanliness.invalidate(commentsUrl);
                             })(pull);
 
                             (function(pull) {
                                 pullPromises.push(Travis.getPullRequestStatus(repoName, pulls[pull].number).then(function(build) {
-                                    console.log(build);
                                     pulls[pull].travisBuild = build;
                                 }));
                             })(pull);

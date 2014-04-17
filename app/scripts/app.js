@@ -5,7 +5,10 @@ angular
     'ngCookies',
     'ngResource',
     'ngSanitize',
-    'ngRoute'
+    'ngRoute',
+    'ngAnimate',
+    'mgcrea.ngStrap.modal',
+    'mgcrea.ngStrap.aside'
   ])
   .config(function ($routeProvider) {
     $routeProvider
