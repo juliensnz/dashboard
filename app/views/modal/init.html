@@ -1,20 +1,13 @@
-<div class="aside-container" ng-show="showConfiguration"></div>
-<div class="aside-backdrop am-fade"></div>
-<div class="aside" tabindex="-1" role="dialog">
-    <div class="aside-dialog">
-        <div class="aside-content">
-            <div class="aside-header" ng-show="configurationTitle">
-                <button type="button" class="close" ng-click="hideConfiguration()">&times;</button>
-                <h4 class="aside-title" ng-bind="configurationTitle"></h4>
-            </div>
-            <div class="aside-body">
-                <form name="configurationForm">
-                    <input type="text" name="organizationName" ng-model="organizationName"  autofocus="on"/>
-                </form>
-            </div>
-            <div class="aside-footer">
-                <button type="submit" class="btn btn-default" ng-click="saveConfiguration(organization)">Save configuration</button>
-            </div>
-        </div>
-    </div>
+
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" ng-click="dismissConfiguration()">&times;</button>
+    <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+</div>
+<div class="modal-body">
+  <input type="text" ng-model="organizationName">
+  <select ng-model="repo" ng-options="repo.name for repo in repos"></select>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    <button type="button" class="btn btn-primary" ng-click="saveConfiguration()">Save changes</button>
 </div>

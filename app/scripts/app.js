@@ -7,8 +7,7 @@ angular
     'ngSanitize',
     'ngRoute',
     'ngAnimate',
-    'mgcrea.ngStrap.modal',
-    'mgcrea.ngStrap.aside'
+    'ui.bootstrap'
   ])
   .config(function ($routeProvider) {
     $routeProvider

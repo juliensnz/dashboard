@@ -11,8 +11,8 @@
     "angular-cookies": "1.2.15",
     "angular-sanitize": "1.2.15",
     "angular-route": "~1.2.15",
-    "angular-strap": "~2.0.0",
-    "bootstrap-additions": "~0.2.2",
+    "angular-animate": "~1.2.0",
+    "angular-bootstrap": "~0.10.0",
     "angular-motion": "~0.3.2"
   },
   "devDependencies": {
