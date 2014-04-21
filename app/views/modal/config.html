@@ -1,0 +1,14 @@
+<div>
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" ng-click="dismissConfiguration()">&times;</button>
+    <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+  </div>
+  <div class="modal-body">
+    <input type="text" ng-bind="organizationName">
+    <select ng-model="repo" ng-options="repo.name for repo in repos"></select>
+  </div>
+  <div class="modal-footer">
+      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      <button type="button" class="btn btn-primary" ng-click="saveConfiguration()">Save changes</button>
+  </div>
+</div>

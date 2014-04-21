@@ -36,6 +36,7 @@ http.createServer(function(req, res) {
             break;
         case 'github':
             req.url = config.github.baseUrl + req.url;
+            req.headers.Authorization = 'Basic ' + config.github.token;
             break;
         default:
             return;

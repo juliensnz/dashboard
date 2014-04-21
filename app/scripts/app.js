@@ -1,13 +1,12 @@
 'use strict';
 
-angular
+var app = angular
   .module('dashboardApp', [
     'ngCookies',
     'ngResource',
     'ngSanitize',
     'ngRoute',
-    'ngAnimate',
-    'ui.bootstrap'
+    'ngAnimate'
   ])
   .config(function ($routeProvider) {
     $routeProvider
@@ -19,9 +18,3 @@ angular
         redirectTo: '/'
       });
   });
-
-var app = angular.module('dashboardApp');
-
-app.config(function () {
-
-});

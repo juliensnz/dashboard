@@ -13,7 +13,10 @@ app.service('Github', [
         var config = {
             'routes': {
                 'repo': {
-                    'url': 'http://localhost:8000/github/repos/::repoName::'
+                    'url': 'https://api.github.com/repos/::repoName::'
+                },
+                'orgs': {
+                    'url': 'https://api.github.com/orgs/::organizationName::'
                 }
             },
         };
@@ -21,13 +24,18 @@ app.service('Github', [
         var service = {
             config: config,
             getOrganization: function(organizationName) {
-                return HybridStorage.getResource('orgs', {'organizationName': organizationName});
+                var url = Routing.proxify(
+                    Routing.mapParamsToRoute(this.config.routes.orgs.url, {'organizationName': organizationName})
+                );
+                return HybridStorage.get(url);
             },
-            getRepos: function(org) {
+            getRepos: function(organizationName) {
                 var deferred = $q.defer();
 
-                HybridStorage.get(org.repos_url).then(function(repos) {
-                    deferred.resolve(repos);
+                this.getOrganization(organizationName).then(function(organization) {
+                    HybridStorage.get(Routing.proxify(organization.repos_url)).then(function(repos) {
+                        deferred.resolve(repos);
+                    });
                 });
 
                 return deferred.promise;
@@ -35,58 +43,67 @@ app.service('Github', [
             getRepo: function(repoName) {
                 var deferred = $q.defer();
 
-                var url = Routing.mapParamsToRoute(this.config.routes.repo.url, {'repoName': repoName});
+                var url = Routing.proxify(Routing.mapParamsToRoute(this.config.routes.repo.url, {'repoName': repoName}));
 
                 HybridStorage.get(url).then(function(repo) {
-                    var promises = [];
+                    deferred.resolve(repo);
+                });
 
-                    promises.push(HybridStorage.get(Routing.clean(repo.pulls_url)).then(function(pulls) {
-                        var pullPromises = [];
+                return deferred.promise;
+            },
+            getPullRequests: function(repo) {
+                var deferred = $q.defer();
+                var promises = [];
 
-                        for (var pull in pulls) {
-                            (function(pull) {
-                                var reviewsUrl = Routing.clean(pulls[pull].review_comments_url);
-                                pullPromises.push(HybridStorage.get(reviewsUrl).then(function(reviews) {
-                                    pulls[pull].reviews = reviews;
-                                }));
+                promises.push(HybridStorage.get(Routing.proxify(
+                    Routing.clean(repo.pulls_url)
+                )).then(function(pulls) {
+                    var pullPromises = [];
 
-                                Cleanliness.invalidate(reviewsUrl);
-                            })(pull);
+                    for (var pull in pulls) {
+                        (function(pull) {
+                            var reviewsUrl = Routing.proxify(
+                                Routing.clean(pulls[pull].review_comments_url)
+                            );
+                            pullPromises.push(HybridStorage.get(reviewsUrl).then(function(reviews) {
+                                pulls[pull].reviews = reviews;
+                            }));
+                        })(pull);
 
-                            (function(pull) {
-                                var commentsUrl = Routing.clean(pulls[pull].comments_url);
-                                pullPromises.push(HybridStorage.get(commentsUrl).then(function(comments) {
-                                    pulls[pull].comments = comments;
-                                }));
+                        (function(pull) {
+                            var commentsUrl = Routing.proxify(
+                                Routing.clean(pulls[pull].comments_url)
+                            );
+                            pullPromises.push(HybridStorage.get(commentsUrl).then(function(comments) {
+                                pulls[pull].comments = comments;
+                            }));
+                        })(pull);
 
-                                Cleanliness.invalidate(commentsUrl);
-                            })(pull);
+                        (function(pull) {
+                            pullPromises.push(Travis.getPullRequestStatus(repo.full_name, pulls[pull].number).then(function(build) {
+                                pulls[pull].travisBuild = build;
+                            }));
+                        })(pull);
 
-                            (function(pull) {
-                                pullPromises.push(Travis.getPullRequestStatus(repoName, pulls[pull].number).then(function(build) {
-                                    pulls[pull].travisBuild = build;
-                                }));
-                            })(pull);
+                        (function(pull) {
+                            pullPromises.push(Jenkins.getPullRequestStatus(pulls[pull].number).then(function(build) {
+                                pulls[pull].behatBuild = build;
+                            }));
+                        })(pull);
+                    }
 
-                            (function(pull) {
-                                pullPromises.push(Jenkins.getPullRequestStatus(pulls[pull].number).then(function(build) {
-                                    pulls[pull].behatBuild = build;
-                                }));
-                            })(pull);
-                        }
-
-                        $q.all(pullPromises).then(function() {
-                            repo.pulls = pulls;
-                        });
-                    }));
-                    promises.push(HybridStorage.get(Routing.clean(repo.commits_url)).then(function(commits) {
-                        repo.commits = commits;
-                    }));
-
-                    $q.all(promises).then(function(){
-                        deferred.resolve(repo);
+                    $q.all(pullPromises).then(function() {
+                        repo.pulls = pulls;
                     });
+                }));
+                promises.push(HybridStorage.get(
+                    Routing.proxify(Routing.clean(repo.commits_url))
+                ).then(function(commits) {
+                    repo.commits = commits;
+                }));
 
+                $q.all(promises).then(function(){
+                    deferred.resolve(repo);
                 });
 
                 return deferred.promise;
@@ -105,20 +122,20 @@ app.service('Github', [
                 var org = {};
                 var deferred = $q.defer();
 
-                HybridStorage.get(repo.commits_url).then(function(commits) {
+                HybridStorage.get(Routing.proxify(repo.commits_url)).then(function(commits) {
                     deferred.resolve(commits);
                 });
 
                 return deferred.promise;
             },
-            getTopContributors: function(org) {
+            getTopContributors: function(organizationName) {
                 var self = this;
                 var deferred = $q.defer();
                 var promises = [];
                 var contributors = {};
                 var topContributors = [];
 
-                this.getRepos(org).then(function(repos) {
+                this.getRepos(organizationName).then(function(repos) {
                     var lastCommits = [];
 
                     for (var i = repos.length - 1; i >= 0; i--) {
@@ -132,10 +149,13 @@ app.service('Github', [
 
                         for (var i = lastCommits.length - 1; i >= 0; i--) {
                             author = lastCommits[i].author;
-                            if (typeof contributors[author.login] == 'undefined') {
-                                contributors[author.login] = {'commitCount': 0, 'author': author};
-                            } else {
-                                contributors[author.login].commitCount++;
+
+                            if (author) {
+                                if (typeof contributors[author.login] == 'undefined') {
+                                    contributors[author.login] = {'commitCount': 0, 'author': author};
+                                } else {
+                                    contributors[author.login].commitCount++;
+                                }
                             }
                         };
 

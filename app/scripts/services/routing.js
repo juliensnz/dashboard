@@ -2,10 +2,30 @@
 
 app.service('Routing', function() {
     var config = {
-        'routes': {
-            'orgs': {
-                'url': 'https://api.github.com/orgs/::organizationName::'
-            }
+        proxy: {
+            url: 'http://localhost:8000/',
+            routes: [
+                {
+                    baseUrl: 'https://api.github.com/',
+                    proxyUrl: 'github'
+                },
+                {
+                    baseUrl: 'https://scrutinizer-ci.com/',
+                    proxyUrl: 'scrutinizer'
+                },
+                {
+                    baseUrl: 'http://ci.akeneo.com/',
+                    proxyUrl: 'jenkins'
+                },
+                {
+                    baseUrl: 'https://akeneo.atlassian.net/',
+                    proxyUrl: 'jira'
+                },
+                {
+                    baseUrl: 'https://api.travis-ci.org/',
+                    proxyUrl: 'travis'
+                }
+            ]
         }
     };
 
@@ -47,6 +67,21 @@ app.service('Routing', function() {
             if (url != newUrl) {
                 return this.clean(newUrl);
             }
+
+            return newUrl;
+        },
+        proxify: function(url) {
+            var newUrl = url;
+
+            for (var i = this.config.proxy.routes.length - 1; i >= 0; i--) {
+                if (url.indexOf(this.config.proxy.routes[i].baseUrl) != -1) {
+                    newUrl = this.config.proxy.url
+                        + this.config.proxy.routes[i].proxyUrl
+                        + '/'
+                        + url.substr(this.config.proxy.routes[i].baseUrl.length)
+                }
+
+            };
 
             return newUrl;
         }

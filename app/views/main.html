@@ -10,7 +10,7 @@
     </ul>
     <div class="navbar-form navbar-right">
       <div class="form-group">
-        <button class="btn btn-default btn-last" ng-click="updateStatus()"><i class="glyphicon glyphicon-refresh"></i></button>
+        <button class="btn btn-default btn-last" ng-click="setConfiguration()"><i class="glyphicon glyphicon-refresh"></i></button>
       </div>
     </div>
   </div>
@@ -101,5 +101,43 @@
         </tr>
       </tbody>
     </table>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6" ng-include="views/widget/project.html">
+  </div>
+</div>
+
+<div class="modal fade" id="configModal" tabindex="-1" role="dialog" ng-controller="ConfigurationCtrl">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">Dashboard configuration</h4>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal configuration-form" role="form">
+          <div class="form-group">
+            <label for="organizationName">Organisation name</label><input type="text" class="form-control" ng-blur="updateOrganization()" ng-model="organizationName" id="organizationName">
+            <label for="repoName">Repository name</label><select ng-model="repoName" class="form-control" id="repoName">
+              <option ng-repeat="repo in repoList">{{ repo.full_name }}</option>
+            </select>
+            <label for="jiraProjectName">Jira project</label>
+            <select ng-model="jiraProjectName" class="form-control" id="jiraProjectName" ng-change="updateProject()">
+              <option ng-repeat="project in projects">{{ project.name }}</option>
+            </select>
+            <label for="jiraProjectVersion">Jira project release</label>
+            <select ng-model="jiraProjectVersion" class="form-control" id="jiraProjectVersion">
+              <option ng-repeat="release in project.versions">{{ release.name }}</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" ng-click="saveConfiguration()">Save changes</button>
+      </div>
+    </div>
   </div>
 </div>
